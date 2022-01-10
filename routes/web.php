@@ -31,13 +31,20 @@ Route::get('home', 'HomeController@index');
 // });
 
 Route::resource('documento','DocumentoController');
-
 Route::resource('tipoDocumento','TipoDocumentoController');
-
 Route::resource('estado','EstadoController');
 
-Route::get('webpay','WebpayController@getTransaccion')->name('webpay.getTransaccion');
+// Route::get('ticket','Admin\TawkTicketController@pendientes')->name('ticket.pendientes');
+// Route::get('ticket','Admin\TawkTicketController@index')->name('ticket.index');
+// Route::get('ticket','Admin\TawkTicketController@edit')->name('ticket.edit');
+// Route::post('ticket','Admin\TawkTicketController@update')->name('ticket.update');
+Route::resource('ticket','Admin\TawkTicketController');
+Route::get('ticket-asignados','Admin\TawkTicketController@asignados')->name('ticket.asignados');
+// Route::get('ticket-pendientes','Admin\TawkTicketController@pendientes')->name('ticket.pendientes');
 
+
+
+Route::get('webpay','WebpayController@getTransaccion')->name('webpay.getTransaccion');
 Route::post('webpay','WebpayController@inicioTransaccion')->name('webpay.inicioTransaccion');
 
 

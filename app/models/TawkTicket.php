@@ -14,13 +14,19 @@ class TawkTicket extends Model
 
     public function agenteSolicitante()
     {
-        return $this->belongsTo(User::class, 'agente_solicitante_id', 'id');
+        // return $this->belongsTo(User::class, 'agente_solicitante_id', 'id');
+        $usuario = $this->belongsTo(User::class, 'agente_solicitante_id', 'id')->get()->first();
+        return $usuario->nombre." ".$usuario->apellido_paterno." ".$usuario->apellido_materno;
     }
 
     public function usuarioAsignado()
     {
         return $this->belongsTo(User::class, 'usuario_asignado_id', 'id');
     }
+
+    // public function getUsuario(){
+    //     return 
+    // }
 
     public function scopeId($query, $id)
     {

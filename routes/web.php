@@ -40,6 +40,7 @@ Route::resource('estado','EstadoController');
 // Route::post('ticket','Admin\TawkTicketController@update')->name('ticket.update');
 Route::resource('ticket','Admin\TawkTicketController');
 Route::get('ticket-asignados','Admin\TawkTicketController@asignados')->name('ticket.asignados');
+Route::post('ticket-updateMensaje/{ticket}','Admin\TawkTicketController@updateMensaje')->name('ticket.updateMensaje');
 // Route::get('ticket-pendientes','Admin\TawkTicketController@pendientes')->name('ticket.pendientes');
 
 

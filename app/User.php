@@ -36,4 +36,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getNombre(){
+        return $this->nombre." ".$this->apellido_paterno." ".$this->apellido_materno;
+    }
 }

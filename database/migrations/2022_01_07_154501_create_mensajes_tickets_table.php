@@ -16,6 +16,7 @@ class CreateMensajesTicketsTable extends Migration
         Schema::create('mensajes_tickets', function (Blueprint $table) {
             $table->id();
             $table->integer('ticket_id');
+            $table->integer('estado_ticket');
             $table->integer('usuario_id');
             $table->longText('mensaje');
             $table->timestamps();

@@ -37,7 +37,7 @@
                             <div class="form-group col-sm-4 col-xl-4">
                                 <label class="text-ms">Ticket creado por</label>
                                 <input type="text" name="agenteSolicitante" id="agenteSolicitante" class="form-control"
-                                    value="{{ $ticket->agenteSolicitante->name }}" readonly="" />
+                                    value="{{ $ticket->agenteSolicitante() }}" readonly="" />
                             </div>
                             <div class="form-group col-sm-4 col-xl-4">
                                 <label class="text-ms">Nombre usuario solicitante</label>
@@ -71,13 +71,21 @@
                                     {{-- @if ($ticket->usuario_asignado_id)                                                                  
                                         <option value='{{ $ticket->usuarioAsignado->id }}'selected="">{{ $ticket->usuarioAsignado->name }}</option>
                                     @endif --}}
-                                    @foreach ($listadoUsuarios as $usuario)
+                                    {{-- @foreach ($listadoUsuarios as $usuario)
                                         @if ($ticket->usuario_asignado_id == $usuario->id)
                                             <option value='{{ $ticket->usuarioAsignado->id }}' selected>
-                                                {{ $ticket->usuarioAsignado->name }}</option>
+                                                {{ $ticket->usuarioAsignado->nombre }}</option>
                                         @else
-                                            <option value="{{ $usuario->id }}">{{ $usuario->name }}</option>
+                                            <option value="{{ $usuario->id }}">{{ $usuario->getNombre() }}</option>
                                         @endif
+                                    @endforeach --}}
+                                    @foreach ($roles as $rol)
+                                        {{-- @if ($ticket->usuario_asignado_id == $usuario->id)
+                                            <option value='{{ $ticket->usuarioAsignado->id }}' selected>
+                                                {{ $ticket->usuarioAsignado->nombre }}</option>
+                                        @else --}}
+                                            <option value="{{ $rol->user_id }}">{{ $rol }}</option>
+                                        {{-- @endif --}}
                                     @endforeach
                                 </select>
                             </div>
@@ -131,81 +139,98 @@
                     <div id="btns" class="row">
                         <div class="col-sm-12">
                             <div class="card mb-3">
-                                <div class="card-header">
-                                    <b>Nuevo mensaje</b>
-                                </div>
-                                <div class="card-body">
-                                    <div class="col-12">
-                                        <div class="row">
-                                            <div class="form-group col-8">
-                                                <textarea class="form-control text-dark" placeholder="Escriba su mensaje" name="mensaje" id="mensaje" rows="5"></textarea>
-                                            </div>
-                                            <div class="row">
-                                                <div class="form-group col-xl-12">
-                                                    <label class="text-ms">Modificar estado del ticket</label>
-                                                    <input type="text" name="estadoTicket" id="estadoTicket"
-                                                        class="form-control text-white {{ $ticket->estadoTicket->clase }}"
-                                                        value="{{ $ticket->estadoTicket->estado }}" readonly="" />
-                                                </div>
-                                                <div class="col-xl-12">
-                                                    <button type="submit" class="ml-2 btn btn-outline-success">Enviar</button>
-                                                </div>
-                                            </div>
-                                        </div>
-
+                                <form action="{{ route('ticket.updateMensaje', $ticket->id) }}" method="POST">
+                                    @csrf
+                                    <div class="card-header">
+                                        <b>Nuevo mensaje</b>
                                     </div>
-                                </div>
+                                    <div class="card-body">
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <div class="form-group col-md-8 col-sm-12">
+                                                    <textarea class="form-control text-dark"
+                                                        placeholder="Escriba su mensaje" name="mensaje" id="mensaje"
+                                                        rows="5"></textarea>
+                                                </div>
+                                                <div class="row col-sm-12 col-md-4">
+                                                    <div class="form-group col-xl-12">
+                                                        <label class="text-ms">Modificar estado del ticket</label>
+
+                                                        <select class="custom-select" name="estadoTicket"
+                                                            id="estadoTicket">
+                                                            <option value="">Estado</option>
+                                                            {{-- Dejar If dentro del ciclo para ver si el usuario asignado es igual a alguno de la lista --}}
+                                                            {{-- @if ($ticket->usuario_asignado_id)                                                                  
+                                                            <option value='{{ $ticket->usuarioAsignado->id }}'selected="">{{ $ticket->usuarioAsignado->name }}</option>
+                                                        @endif --}}
+                                                            @foreach ($estados as $estado)
+                                                                @if ($ticket->estado_ticket_id == $estado->id)
+                                                                    <option value='{{ $estado->id }}' selected>
+                                                                        {{ $estado->estado }}</option>
+                                                                @else
+                                                                    <option value="{{ $estado->id }}">
+                                                                        {{ $estado->estado }}</option>
+                                                                @endif
+                                                            @endforeach
+                                                        </select>
+
+                                                        {{-- <input type="text" name="estadoTicket" id="estadoTicket"
+                                                        class="form-control text-white {{ $ticket->estadoTicket->clase }}"
+                                                        value="{{ $ticket->estadoTicket->estado }}" readonly="" /> --}}
+                                                    </div>
+                                                    <div class="col-xl-12">
+                                                        <button type="submit"
+                                                            class="ml-2 btn btn-outline-success">Enviar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </form>
+
+
                             </div>
 
                         </div>
                     </div>
 
                     <div id="btns" class="row">
-                        <div class="col-sm-4">
-                            
-                            @foreach ($mensajes as $mensaje)
-                            <p>{{$mensaje->mensaje}}</p>
-                            @endforeach
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <b>Mensaje 1 de 2</b>
-                                </div>
-                                <div class="card-body">
-                                    <div class="col-12">
-                                        <div class="row">
-                                            <h5 class="col-sm-6">Gonzalo Soto</h5>
-                                            <h5 class="col-sm-6">16-12-2021</h5>
-                                            <div class="form-group col-xl-12">
-                                                <textarea class="form-control text-dark" name="mensaje" id="mensaje"
-                                                    rows="5" readonly="">{{ $ticket->mensaje }}</textarea>
-                                            </div>
 
-                                        </div>
+                        @php
+                            $count = 1;
+                            $cantidad = count($mensajes);
+                        @endphp
+                        @foreach ($mensajes as $mensaje)
 
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>Mensaje {{ $count++ }} de {{ $cantidad }}</b>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
+                                    <div class="card-body">
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <h5 class="col-9">{{ $mensaje->usuario() }}</h5>
+                                                <div class="col-3  d-flex flex-row-reverse mb-2">
+                                                    <input type="text" name="estadoTicket" id="estadoTicket"
+                                                    class="text-white form-control text-right {{ $mensaje->estadoTicket->clase }}"
+                                                    value="{{ $mensaje->estadoTicket->estado }} {{ $mensaje->created_at->format('d-m-y H:m') }}" readonly="" />
+                                                    {{-- <h5 class="col-4 d-flex flex-row-reverse">{{ $mensaje->created_at->format('d-m-y H:m') }}</h5> --}}
 
-                        <div class="col-sm-4">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <b>Mensaje 2 de 2</b>
-                                </div>
-                                <div class="card-body">
-                                    <div class="col-12">
-                                        <div class="row">
-                                            <h5 class="col-sm-6">Jorge Araya</h5>
-                                            <h5 class="col-sm-6">20-12-2021</h5>
-                                            <div class="form-group col-xl-12">
-                                                <textarea class="form-control text-dark" name="mensaje" id="mensaje"
-                                                    rows="5" readonly="">{{ $ticket->mensaje }}</textarea>
+                                                </div>
+                                                <div class="form-group col-xl-12">
+                                                    <textarea class="form-control text-dark" name="mensaje" id="mensaje"
+                                                        rows="4" readonly="">{{ $mensaje->mensaje }}</textarea>
+                                                </div>
+
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

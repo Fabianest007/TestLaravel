@@ -61,7 +61,7 @@
                                         <select class="custom-select" name="usuarioAsignado" id="usuarioAsignado">
                                             <option value="">Usuario Asignado</option>
                                             @foreach ($listadoUsuarios as $usuario)
-                                                    <option value="{{ $usuario->id }}">{{ $usuario->name }}</option>
+                                                    <option value="{{ $usuario->id }}">{{ $usuario->getNombre() }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -145,10 +145,10 @@
                                                 {{ $ticket->estadoTicket->estado }}
                                             </div>
                                         </td>
-                                        <td class="text-center">{{ $ticket->agenteSolicitante->name }}</td>
+                                        <td class="text-center">{{ $ticket->agenteSolicitante() }}</td>
                                         <td class="text-center">
                                             @if ($ticket->usuarioAsignado != null)
-                                                {{ $ticket->usuarioAsignado->name }}
+                                                {{ $ticket->usuarioAsignado->nombre }} {{ $ticket->usuarioAsignado->apellido_paterno }} {{ $ticket->usuarioAsignado->apellido_materno }}
                                             @endif
                                         </td>
                                         <td>

@@ -24,6 +24,12 @@ class TawkTicket extends Model
         return $this->belongsTo(User::class, 'usuario_asignado_id', 'id');
     }
 
+    public function nombreUsuarioAsignado()
+    {
+        $usuario = $this->belongsTo(User::class, 'usuario_asignado_id', 'id')->get()->first();
+        return $usuario->nombre." ".$usuario->apellido_paterno." ".$usuario->apellido_materno;
+    }
+
     // public function getUsuario(){
     //     return 
     // }

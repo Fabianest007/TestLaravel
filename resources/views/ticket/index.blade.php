@@ -11,7 +11,7 @@
                 {{-- <li class="breadcrumb-item"><a href="{{ route('cupones-descuento.index') }}"><i
                             class="fe fe-file-plus mr-2 fs-14"></i>{{ __('Campañas') }}</a></li> --}}
                 <li class="breadcrumb-item active" aria-current="page">
-                    <a href="{{route('ticket.index')}}">
+                    <a href="{{ route('ticket.index') }}">
                         {{ __('Tickets') }}
                     </a>
                 </li>
@@ -60,8 +60,8 @@
                                     <div class="form-group col-md-2">
                                         <select class="custom-select" name="usuarioAsignado" id="usuarioAsignado">
                                             <option value="">Usuario Asignado</option>
-                                            @foreach ($listadoUsuarios as $usuario)
-                                                    <option value="{{ $usuario->id }}">{{ $usuario->getNombre() }}</option>
+                                            @foreach ($roles as $rol)
+                                                <option value="{{ $rol->user_id }}">{{ $rol->usuario() }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -72,12 +72,13 @@
                                     </div> --}}
 
                                     <div class="form-group col-md-2">
-                                        <input type="text" name="correoUsuario" id="correoUsuario"
-                                            class="form-control" placeholder="Correo Usuario" value="">
+                                        <input type="text" name="correoUsuario" id="correoUsuario" class="form-control"
+                                            placeholder="Correo Usuario" value="">
                                     </div>
 
                                     <div class="form-group col-md-2">
-                                      <input type="date" name="fecha" id="fecha" class="form-control" placeholder="" aria-describedby="helpId">
+                                        <input type="date" name="fecha" id="fecha" class="form-control" placeholder=""
+                                            aria-describedby="helpId">
                                     </div>
 
                                     {{-- <div class="form-group col-md-4">
@@ -148,21 +149,22 @@
                                         <td class="text-center">{{ $ticket->agenteSolicitante() }}</td>
                                         <td class="text-center">
                                             @if ($ticket->usuarioAsignado != null)
-                                                {{ $ticket->usuarioAsignado->nombre }} {{ $ticket->usuarioAsignado->apellido_paterno }} {{ $ticket->usuarioAsignado->apellido_materno }}
+                                                {{ $ticket->usuarioAsignado->nombre }}
+                                                {{ $ticket->usuarioAsignado->apellido_paterno }}
+                                                {{ $ticket->usuarioAsignado->apellido_materno }}
                                             @endif
                                         </td>
                                         <td>
                                             <div class="btn-toolbar" role="toolbar">
                                                 <div class="btn-group mr-2">
-                                                    <a href="{{ route('ticket.edit', $ticket) }}"
-                                                        class="btn btn-success" data-toggle="tooltip" title=""
+                                                    <a href="{{ route('ticket.edit', $ticket) }}" class="btn btn-success"
+                                                        data-toggle="tooltip" title=""
                                                         data-original-title="Ver detalle ticket">
                                                         <i class="fa fa-eye"></i>
                                                     </a>
                                                     &nbsp;
-                                                    <a href="{{ route('ticket.index') }}"
-                                                        class="btn btn-info" data-toggle="tooltip" title=""
-                                                        data-original-title="Ver PDF">
+                                                    <a href="{{ route('ticket.index') }}" class="btn btn-info"
+                                                        data-toggle="tooltip" title="" data-original-title="Ver PDF">
                                                         <i class="fa fa-eye"></i>
                                                     </a>
                                                 </div>

@@ -80,12 +80,12 @@
                                         @endif
                                     @endforeach --}}
                                     @foreach ($roles as $rol)
-                                        {{-- @if ($ticket->usuario_asignado_id == $usuario->id)
-                                            <option value='{{ $ticket->usuarioAsignado->id }}' selected>
-                                                {{ $ticket->usuarioAsignado->nombre }}</option>
-                                        @else --}}
-                                            <option value="{{ $rol->user_id }}">{{ $rol }}</option>
-                                        {{-- @endif --}}
+                                        @if ($ticket->usuario_asignado_id == $rol->user_id)
+                                            <option value={{ $ticket->usuarioAsignado->id }} selected>
+                                                {{ $rol->usuario() }}</option>
+                                        @else
+                                            <option value="{{ $rol->user_id }}">{{ $rol->usuario() }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>
@@ -155,14 +155,9 @@
                                                 <div class="row col-sm-12 col-md-4">
                                                     <div class="form-group col-xl-12">
                                                         <label class="text-ms">Modificar estado del ticket</label>
-
                                                         <select class="custom-select" name="estadoTicket"
                                                             id="estadoTicket">
                                                             <option value="">Estado</option>
-                                                            {{-- Dejar If dentro del ciclo para ver si el usuario asignado es igual a alguno de la lista --}}
-                                                            {{-- @if ($ticket->usuario_asignado_id)                                                                  
-                                                            <option value='{{ $ticket->usuarioAsignado->id }}'selected="">{{ $ticket->usuarioAsignado->name }}</option>
-                                                        @endif --}}
                                                             @foreach ($estados as $estado)
                                                                 @if ($ticket->estado_ticket_id == $estado->id)
                                                                     <option value='{{ $estado->id }}' selected>
@@ -173,10 +168,20 @@
                                                                 @endif
                                                             @endforeach
                                                         </select>
-
-                                                        {{-- <input type="text" name="estadoTicket" id="estadoTicket"
-                                                        class="form-control text-white {{ $ticket->estadoTicket->clase }}"
-                                                        value="{{ $ticket->estadoTicket->estado }}" readonly="" /> --}}
+                                                        <div class="mt-3 pl-1">
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    id="enviarAlAgente" name="enviarAlAgente" value="true">
+                                                                <label class="form-check-label" for="inlineCheckbox1">Enviar
+                                                                    al Agente</label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    id="enviarAlUsuario" name="enviarAlUsuario" value="true">
+                                                                <label class="form-check-label" for="inlineCheckbox2">Enviar
+                                                                    al Usuario</label>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <div class="col-xl-12">
                                                         <button type="submit"
@@ -214,8 +219,9 @@
                                                 <h5 class="col-9">{{ $mensaje->usuario() }}</h5>
                                                 <div class="col-3  d-flex flex-row-reverse mb-2">
                                                     <input type="text" name="estadoTicket" id="estadoTicket"
-                                                    class="text-white form-control text-right {{ $mensaje->estadoTicket->clase }}"
-                                                    value="{{ $mensaje->estadoTicket->estado }} {{ $mensaje->created_at->format('d-m-y H:m') }}" readonly="" />
+                                                        class="text-white form-control text-right {{ $mensaje->estadoTicket->clase }}"
+                                                        value="{{ $mensaje->estadoTicket->estado }} {{ $mensaje->created_at->format('d-m-y H:m') }}"
+                                                        readonly="" />
                                                     {{-- <h5 class="col-4 d-flex flex-row-reverse">{{ $mensaje->created_at->format('d-m-y H:m') }}</h5> --}}
 
                                                 </div>

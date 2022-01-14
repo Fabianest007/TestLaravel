@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SolucionTicketMail;
+use App\Mail\TicketMail;
 use App\models\EstadoTicket;
 use App\models\MensajesTicket;
 use App\models\RoleUser;
@@ -10,6 +12,7 @@ use App\models\TawkTicket;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class TawkTicketController extends Controller
 {
@@ -27,32 +30,24 @@ class TawkTicketController extends Controller
             ->estado($request->estado)
             ->paginate(10);
 
-        // return $request;
-
-        $listadoUsuarios = User::get();
+        //Muestra los roles que son distintos a los de los usuarios
+        $roles = RoleUser::whereIn('role_id', [1, 5, 6])->get();
         return view("ticket.index", [
             "tickets" => $tickets,
-            'listadoUsuarios' => $listadoUsuarios
+            'roles' => $roles
         ]);
     }
 
-    // public function pendientes()
-    // {
-    //     $tickets = TawkTicket::where(['estado_ticket_id' => 1])->paginate(10);
-    //     return view("ticket.index", [
-    //         "tickets" => $tickets,
-    //         "titulo" => "TICKETS PENDIENTES"
-    //     ]);
-    // }
 
+    //Muestra los tickets asignados al usuario logueado
     public function asignados()
     {
         $user = Auth::user();
-        $listadoUsuarios = User::get();
+        $roles = RoleUser::whereIn('role_id', [1, 5, 6])->get();
         $tickets = TawkTicket::where(['usuario_asignado_id' => $user->id])->paginate(10);
         return view("ticket.index", [
             "tickets" => $tickets,
-            'listadoUsuarios' => $listadoUsuarios,
+            'roles' => $roles,
             "titulo" => "TICKETS ASIGNADOS A MI"
         ]);
     }
@@ -95,17 +90,15 @@ class TawkTicketController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+
     public function edit(TawkTicket $ticket)
     {
-        // $listadoUsuarios = User::whereNotIn(['rol' != 'user']);
-        $roles = RoleUser::whereIn('role_id',[1,2])->get();
-    // return $roles;
+        $roles = RoleUser::whereIn('role_id', [1, 5, 6])->get();
         $estados = EstadoTicket::all();
         $mensajes = MensajesTicket::where(['ticket_id' => $ticket->id])->orderBy('created_at', 'DESC')->get();
-        $listadoUsuarios = User::get();
         return view('ticket.edit', [
             'ticket' => $ticket,
-            'listadoUsuarios' => $listadoUsuarios,
             'mensajes' => $mensajes,
             'estados' => $estados,
             'roles' => $roles
@@ -121,20 +114,24 @@ class TawkTicketController extends Controller
      */
     public function update(Request $request, TawkTicket $ticket)
     {
-        $ticket->usuario_asignado_id = $request->usuarioAsignado;
-        if ($ticket->estado_ticket_id != '3'){
+        //Si el ticket ya está solucionado, no se modifica el estado del ticket al asignar un usuario
+        if ($ticket->estado_ticket_id != '3') {
             $ticket->estado_ticket_id = 2;
         }
 
-        
-        //Hacer que se le envíe un correo al usuario asignado
-        try {
-            if ($ticket->update()) {
-                return redirect()->route('ticket.edit', $ticket);
+        //Solo se enviará el correo si el usuario asignado cambió con respecto al anterior
+        if ($ticket->usuario_asignado_id != $request->usuarioAsignado) {
+            $ticket->usuario_asignado_id = $request->usuarioAsignado;
+            try {
+                if ($ticket->update()) {
+                    Mail::to($ticket->usuarioAsignado->email)->send(new TicketMail($ticket));
+                    return redirect()->route('ticket.edit', $ticket);
+                }
+            } catch (\Throwable $th) {
+                return $th->getMessage();
             }
-        } catch (\Throwable $th) {
-            return $th->getMessage();
         }
+        return redirect()->route('ticket.edit', $ticket);
     }
 
     public function updateMensaje(Request $request, TawkTicket $ticket)
@@ -145,14 +142,21 @@ class TawkTicketController extends Controller
         $mensaje->estado_ticket = $request->estadoTicket;
         $mensaje->usuario_id = Auth::user()->id;
         $ticket->estado_ticket_id = $request->estadoTicket;
-        if($ticket->estado_ticket_id == 3){
+        if ($ticket->estado_ticket_id == 3) {
             $ticket->fecha_solucion = date("Y-m-d H:i:s");
         }
-        // return $ticket;
-
+ 
         try {
             if ($mensaje->save()) {
                 if ($ticket->update()) {
+
+                    if ($ticket->estado_ticket_id == 3 && $request->enviarAlAgente){
+                        Mail::to($ticket->agente_solicitante_correo)->send(new SolucionTicketMail($ticket, $mensaje));
+                    }
+
+                    if ($ticket->estado_ticket_id == 3 && $request->enviarAlUsuario){
+                        Mail::to($ticket->correo_solicitante)->send(new SolucionTicketMail($ticket, $mensaje));
+                    }
                     return redirect()->route('ticket.edit', $ticket);
                 }
             }
@@ -160,7 +164,6 @@ class TawkTicketController extends Controller
             return $th->getMessage();
         }
     }
-
     /**
      * Remove the specified resource from storage.
      *
